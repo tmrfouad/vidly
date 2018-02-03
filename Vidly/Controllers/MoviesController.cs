@@ -7,12 +7,6 @@ namespace Vidly.Controllers
 {
     public class MoviesController : Controller
     {
-        private List<Customer> _customers = new List<Customer>
-        {
-            new Customer {Id = 1, Name = "Tamer Fouad"},
-            new Customer {Id = 2, Name = "Mahmoud Awad"}
-        };
-
         private List<Movie> _movies = new List<Movie>
         {
             new Movie {Id = 1, Name = "Shrek!"},
@@ -23,7 +17,7 @@ namespace Vidly.Controllers
         public ActionResult Random()
         {
             var movie = new Movie() { Name = "Shrek!" };
-            _customers = new List<Customer>
+            var customers = new List<Customer>
             {
                 new Customer {Name = "Customer 1"},
                 new Customer {Name = "Customer 2"},
@@ -36,7 +30,7 @@ namespace Vidly.Controllers
             var viewModel = new RandomMovieViewModel
             {
                 Movie = movie,
-                Customers = _customers
+                Customers = customers
             };
 
             return View(viewModel);
@@ -56,18 +50,6 @@ namespace Vidly.Controllers
         public ActionResult ByReleaseDate(int year, int month)
         {
             return Content($"year = { year }, month = '{ month }'");
-        }
-
-        public ActionResult Customers()
-        {
-            return View(_customers);
-        }
-
-        [Route("movies/customers/details/{id:range(1,2)}")]
-        public ActionResult CustomerDetails(int id)
-        {
-            Customer customer = _customers.Find(c => c.Id == id);
-            return View(customer);
         }
     }
 }
