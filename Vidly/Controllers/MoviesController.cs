@@ -53,10 +53,9 @@ namespace Vidly.Controllers
             }
 
             var genres = _context.Genres;
-            var viewModel = new MovieFormViewModel
+            var viewModel = new MovieFormViewModel(movie)
             {
-                Genres = genres,
-                Movie = movie
+                Genres = genres
             };
 
             return View("MovieForm", viewModel);
@@ -64,8 +63,7 @@ namespace Vidly.Controllers
 
         public ActionResult Index()
         {
-            var movies = _context.Movies.Include(m => m.Genre).ToList();
-            return View(movies);
+            return View();
         }
 
         [Route("movies/released/{year:regex(2016|2017)}/{month:regex(\\d{2}):range(1, 12)}")]
@@ -92,8 +90,19 @@ namespace Vidly.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Save(Movie movie)
         {
+            if (!ModelState.IsValid)
+            {
+                var viewModel = new MovieFormViewModel(movie)
+                {
+                    Genres = _context.Genres.ToList()
+                };
+
+                return View("MovieForm", viewModel);
+            }
+
             if (movie.Id == 0)
             {
                 _context.Movies.Add(movie);
@@ -103,6 +112,7 @@ namespace Vidly.Controllers
                 var orgMovie = _context.Movies.Single(m => m.Id == movie.Id);
                 orgMovie.Name = movie.Name;
                 orgMovie.ReleaseDate = movie.ReleaseDate;
+                orgMovie.DateAdded = movie.DateAdded;
                 orgMovie.GenreId = movie.GenreId;
                 orgMovie.NumberInStock = movie.NumberInStock;
             }
